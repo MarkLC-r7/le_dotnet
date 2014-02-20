@@ -17,10 +17,10 @@ namespace LogentriesCore.Net
         #region Constants
 
         // Current version number.
-        protected const String Version = "2.4.0";
+        protected const String Version = "2.4.4";
 
         // Size of the internal event queue. 
-        protected const int QueueSize = 32768;
+        protected const int DefaultQueueSize = 32768;
 
         // Minimal delay between attempts to reconnect in milliseconds. 
         protected const int MinDelay = 100;
@@ -103,12 +103,6 @@ namespace LogentriesCore.Net
 
         public AsyncLogger()
         {
-            Queue = new BlockingCollection<string>(QueueSize);
-            _allQueues.Add(Queue);
-
-            WorkerThread = new Thread(new ThreadStart(Run));
-            WorkerThread.Name = "Logentries Log4net Appender";
-            WorkerThread.IsBackground = true;
         }
 
         #region Configuration properties
@@ -116,10 +110,12 @@ namespace LogentriesCore.Net
         private String m_Token = "";
         private String m_AccountKey = "";
         private String m_Location = "";
+	private String m_HardDns = "";
         private bool m_ImmediateFlush = false;
         private bool m_Debug = false;
         private bool m_UseHttpPut = false;
         private bool m_UseSsl = false;
+	private int m_BufferSize = DefaultQueueSize;
 
         public void setToken(String token)
         {
@@ -191,6 +187,25 @@ namespace LogentriesCore.Net
             return m_UseSsl;
         }
 
+	public void setHardDns(String hardDns)
+	{
+ 	    m_HardDns = hardDns;
+	}
+
+	public String getHardDns()
+	{	
+	    return m_HardDns;
+	}
+
+	public void setBufferSize(int buffSize)
+	{
+	    m_BufferSize = buffSize;
+	}
+
+	public int getBufferSize(int buffSize)
+	{
+	    return m_BufferSize;
+	}
         #endregion
 
         protected readonly BlockingCollection<string> Queue;
@@ -441,9 +456,15 @@ namespace LogentriesCore.Net
             {
                 if (LoadCredentials())
                 {
-                    WriteDebugMessages("Starting Logentries asynchronous socket client.");
-                    WorkerThread.Start();
-                    IsRunning = true;
+            		Queue = new BlockingCollection<string>(m_BufferSize);
+            		_allQueues.Add(Queue);
+
+            		WorkerThread = new Thread(new ThreadStart(Run));
+            		WorkerThread.Name = "Logentries Appender";
+            		WorkerThread.IsBackground = true;
+                    	WriteDebugMessages("Starting Logentries asynchronous socket client.");
+                    	WorkerThread.Start();
+                    	IsRunning = true;
                 }
             }
 

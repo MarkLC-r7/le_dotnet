@@ -99,6 +99,32 @@ namespace log4net.Appender
             }
         }
 
+	/* Provide DNS to use specific destination server. */
+	public String HardDns
+	{
+	    get
+	    {
+	        return logentriesAsync.getHardDns();
+	    }
+	    set
+	    {
+	        logentriesAsync.setHardDns(value);
+	    }
+	}
+
+	/* Provide integer to use as buffer size, Default is 32768 messages. */
+	public int BufferSize
+	{
+	    get
+	    {
+	        return logentriesAsync.getBufferSize();
+	    }
+	    set
+	    {
+	        logentriesAsync.setBufferSize(value);
+	    }
+	}
+
         /* This property exists for backward compatibility with older configuration XML. */
         [Obsolete("Use the UseHttpPut property instead.")]
         public bool HttpPut

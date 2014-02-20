@@ -64,6 +64,20 @@ namespace NLog.Targets
             set { logentriesAsync.setLocation(value); }
         }
 
+	/** DNS value for specific destination server */
+	public String HardDns
+	{
+	    get { return logentriesAsync.getHardDns(); }
+	    set { logentriesAsync.setHardDns(value); }
+	}
+
+	/** Integer BufferSize. Default: 32768 messages */
+	public int BufferSize
+	{
+	    get { return logentriesAsync.getBufferSize(); }
+	    set { logentriesAsync.setBufferSize(value); }
+	}
+
         public bool KeepConnection { get; set; }
 
         protected override void Write(LogEventInfo logEvent)

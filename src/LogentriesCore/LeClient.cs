@@ -11,7 +11,7 @@ namespace LogentriesCore.Net
     class LeClient
     {
         // Logentries API server address. 
-        protected const String LeApiUrl = "api.logentries.com";
+        protected const String DefaultLeApiUrl = "api.logentries.com";
 
         // Port number for token logging on Logentries API server. 
         protected const int LeApiTokenPort = 10000;
@@ -60,17 +60,21 @@ v1xy+6OfZyGudXhXag82LOfiUgU7hp+RfyUG2KXhIRzhMtDOHpyBjGnVLB0bGYcC
 kAuBvDPPm+C0/M4RLYs=
 -----END CERTIFICATE-----"));
 
-        public LeClient(bool useHttpPut, bool useSsl)
+        public LeClient(bool useHttpPut, bool useSsl, String hardDns)
         {
             m_UseSsl = useSsl;
             if (!m_UseSsl)
                 m_TcpPort = useHttpPut ? LeApiHttpPort : LeApiTokenPort;
             else
                 m_TcpPort = useHttpPut ? LeApiHttpsPort : LeApiTokenTlsPort;
+
+	    if (hardDns != "")
+	        m_HardDns = hardDns;		
         }
 
         private bool m_UseSsl = false;
         private int m_TcpPort;
+	private String m_HardDns = DefaultLeApiUrl;
         private TcpClient m_Client = null;
         private Stream m_Stream = null;
         private SslStream m_SslStream = null;
@@ -85,7 +89,7 @@ kAuBvDPPm+C0/M4RLYs=
 
         public void Connect()
         {
-            m_Client = new TcpClient(LeApiUrl, m_TcpPort);
+            m_Client = new TcpClient(m_HardDns, m_TcpPort);
             m_Client.NoDelay = true;
 
             m_Stream = m_Client.GetStream();
